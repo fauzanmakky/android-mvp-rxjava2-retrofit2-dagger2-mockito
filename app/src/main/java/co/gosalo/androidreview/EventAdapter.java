@@ -3,7 +3,9 @@ package co.gosalo.androidreview;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import java.util.List;
 
@@ -23,14 +25,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        AppCompatTextView textView = (AppCompatTextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.code_result, parent, false);
-        return new ViewHolder(textView);
+        FrameLayout layout = (FrameLayout) LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.event_element, parent, false);
+        return new ViewHolder(layout);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.textView.setText(events.get(position).getTitle());
+        Event event = events.get(position);
+        holder.title.setText(event.getTitle());
+        holder.venue.setText(event.getVenue());
     }
 
     @Override
@@ -40,11 +44,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView textView;
+        private AppCompatTextView title;
+        private AppCompatTextView venue;
 
-        public ViewHolder(AppCompatTextView textView) {
-            super(textView);
-            this.textView = textView;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.title = itemView.findViewById(R.id.title);
+            this.venue = itemView.findViewById(R.id.venue);
         }
     }
 }
