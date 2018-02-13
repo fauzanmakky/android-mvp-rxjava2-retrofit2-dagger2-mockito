@@ -1,4 +1,4 @@
-package co.gosalo.androidreview;
+package co.gosalo.androidreview.main.mvp.view.adapter;
 
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
@@ -9,7 +9,8 @@ import android.widget.FrameLayout;
 
 import java.util.List;
 
-import co.gosalo.androidreview.api.model.Event;
+import co.gosalo.androidreview.R;
+import co.gosalo.androidreview.app.api.model.Event;
 
 /**
  * Created by jorge on 05/02/2018.
