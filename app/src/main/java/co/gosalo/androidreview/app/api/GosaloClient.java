@@ -2,6 +2,7 @@ package co.gosalo.androidreview.app.api;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GosaloClient {
@@ -20,6 +21,7 @@ public class GosaloClient {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(BASE_URL);
 
         retrofit = builder.build();
