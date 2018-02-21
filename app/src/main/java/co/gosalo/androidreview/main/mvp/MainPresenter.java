@@ -2,14 +2,9 @@ package co.gosalo.androidreview.main.mvp;
 
 import android.util.Log;
 
-import java.util.List;
-
-import co.gosalo.androidreview.app.api.PagedResponseBody;
-import co.gosalo.androidreview.app.api.model.Event;
 import co.gosalo.androidreview.main.mvp.view.MainView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 
@@ -36,28 +31,18 @@ public class MainPresenter {
         disposable = mainModel.getEvents()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribeWith(new DisposableObserver<PagedResponseBody<List<Event>>>() {
-                    @Override
-                    public void onNext(PagedResponseBody<List<Event>> listPagedResponseBody) {
-                        List<Event> events = listPagedResponseBody.getContent();
-                        mainView.setEvents(events);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof HttpException) {
-                            HttpException httpException = (HttpException) e;
-                            Log.d(LOG_TAG, String.valueOf(httpException.code()));
-                        }
-                        mainView.showLoading(false);
-                        Log.i(LOG_TAG, "Gosalo call failed: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mainView.showLoading(false);
-                    }
-                });
+                .subscribe(
+                        listPagedResponseBody -> mainView.setEvents(listPagedResponseBody.getContent()),
+                        throwable -> {
+                            if (throwable instanceof HttpException) {
+                                HttpException httpException = (HttpException) throwable;
+                                Log.d(LOG_TAG, String.valueOf(httpException.code()));
+                            }
+                            mainView.showLoading(false);
+                            Log.i(LOG_TAG, "Gosalo call failed: " + throwable.getMessage());
+                        },
+                        () -> mainView.showLoading(false)
+                );
     }
 
     public void onDestroy() {
