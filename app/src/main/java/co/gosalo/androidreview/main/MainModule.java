@@ -1,7 +1,5 @@
 package co.gosalo.androidreview.main;
 
-import android.content.Context;
-
 import co.gosalo.androidreview.app.api.GosaloService;
 import co.gosalo.androidreview.main.mvp.MainModel;
 import co.gosalo.androidreview.main.mvp.MainPresenter;
@@ -16,10 +14,10 @@ import dagger.Provides;
 @Module
 public class MainModule {
 
-    private final Context context;
+    private final MainActivity activity;
 
-    public MainModule(Context context) {
-        this.context = context;
+    public MainModule(MainActivity activity) {
+        this.activity = activity;
     }
 
     @MainScope
@@ -31,7 +29,7 @@ public class MainModule {
     @MainScope
     @Provides
     public MainView provideMainView() {
-        return new MainView(context);
+        return new MainView(activity);
     }
 
     @MainScope

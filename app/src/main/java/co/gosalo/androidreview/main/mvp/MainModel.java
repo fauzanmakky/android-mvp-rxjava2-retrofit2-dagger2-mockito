@@ -19,7 +19,7 @@ public class MainModel {
         this.service = service;
     }
 
-    public Observable<PagedResponseBody<List<Event>>> getEvents() {
-        return service.getEvents();
+    public Observable<PagedResponseBody<List<Event>>> getEvents(int page) {
+        return service.getEvents(page);
     }
 }

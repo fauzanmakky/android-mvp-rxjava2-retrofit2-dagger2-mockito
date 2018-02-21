@@ -37,4 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         presenter.onDestroy();
     }
+
+    public void incrementPage() {
+        presenter.incrementPage();
+    }
 }

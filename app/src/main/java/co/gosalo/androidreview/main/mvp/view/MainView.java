@@ -1,7 +1,7 @@
 package co.gosalo.androidreview.main.mvp.view;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,35 +13,40 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.gosalo.androidreview.R;
 import co.gosalo.androidreview.app.api.model.Event;
+import co.gosalo.androidreview.main.MainActivity;
 import co.gosalo.androidreview.main.mvp.view.adapter.EventAdapter;
 
 /**
  * Created by jorge on 12/02/2018.
  */
 
+@SuppressLint("ViewConstructor")
 public class MainView extends FrameLayout {
 
     @BindView(R.id.events_list)
     RecyclerView recyclerView;
 
     private final ProgressDialog progressDialog;
+    private EventAdapter adapter;
 
-    public MainView(@NonNull Context context) {
-        super(context);
+    public MainView(@NonNull MainActivity activity) {
+        super(activity);
 
-        inflate(context, R.layout.activity_main, this);
+        inflate(activity, R.layout.activity_main, this);
         ButterKnife.bind(this);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layoutManager);
 
-        progressDialog = new ProgressDialog(context);
+        adapter = new EventAdapter(activity);
+        recyclerView.setAdapter(adapter);
+
+        progressDialog = new ProgressDialog(activity);
         progressDialog.setMessage("Looking for events");
     }
 
-    public void setEvents(List<Event> events) {
-        RecyclerView.Adapter adapter = new EventAdapter(events);
-        recyclerView.setAdapter(adapter);
+    public void addEvents(List<Event> events) {
+        adapter.addEvents(events);
     }
 
     public void showLoading(boolean loading) {
