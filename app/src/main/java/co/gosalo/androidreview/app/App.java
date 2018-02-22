@@ -21,9 +21,6 @@ public class App extends Application {
     }
 
     public static MainComponent createMainComponent(MainActivity activity) {
-        return co.gosalo.androidreview.main.DaggerMainComponent.builder()
-                .appComponent(appComponent)
-                .mainModule(new MainModule(activity))
-                .build();
+        return appComponent.plusMainComponent(new MainModule(activity));
     }
 }
