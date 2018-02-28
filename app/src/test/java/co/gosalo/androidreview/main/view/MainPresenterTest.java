@@ -8,9 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import co.gosalo.androidreview.app.api.PagedResponseBody;
 import co.gosalo.androidreview.app.api.model.Event;
 import co.gosalo.androidreview.main.mvp.MainModel;
 import co.gosalo.androidreview.main.mvp.MainPresenter;
@@ -28,31 +29,64 @@ public class MainPresenterTest {
     @Rule
     public RxSchedulersOverrideRule rule = new RxSchedulersOverrideRule();
 
-    private static final int FIRST_PAGE = 0;
+    @Mock
+    private MainModel model;
 
     @Mock
-    private MainModel mainModel;
+    private MainView view;
 
-    @Mock
-    private MainView mainView;
-
-    private MainPresenter mainPresenter;
+    private MainPresenter presenter;
 
     @Before
     public void setUp() throws Exception {
-        mainPresenter = new MainPresenter(mainModel, mainView);
+        presenter = new MainPresenter(model, view);
     }
 
     @Test
     public void shouldPassEventsToView() {
         // given
-        PagedResponseBody<List<Event>> listPagedResponseBody = new PagedResponseBody<>();
+        List<Event> events = Arrays.asList(new Event(), new Event(), new Event());
 
         // when
-        Mockito.when(mainModel.getEvents(FIRST_PAGE)).thenReturn(Observable.just(listPagedResponseBody));
-        mainPresenter.onCreate();
+        Mockito.when(model.getNextEvents()).thenReturn(Observable.just(events));
+        presenter.onCreate();
 
         // then
-        Mockito.verify(mainView, Mockito.times(1)).addEvents(listPagedResponseBody.getContent());
+        Mockito.verify(view, Mockito.times(1)).showLoading(true);
+        Mockito.verify(view, Mockito.times(1)).addEvents(events);
+        Mockito.verify(view, Mockito.times(1)).showLoading(false);
+        Mockito.verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void shouldHandleNoEvents() {
+        // given
+        List<Event> events = new ArrayList<>();
+
+        // when
+        Mockito.when(model.getNextEvents()).thenReturn(Observable.just(events));
+        presenter.onCreate();
+
+        // then
+        Mockito.verify(view, Mockito.times(1)).showLoading(true);
+        Mockito.verify(view, Mockito.times(1)).showNoEvents();
+        Mockito.verify(view, Mockito.times(1)).showLoading(false);
+        Mockito.verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void shouldHandleError() {
+        // given
+        Exception exception = new Exception();
+
+        // when
+        Mockito.when(model.getNextEvents()).thenReturn(Observable.error(exception));
+        presenter.onCreate();
+
+        // then
+        Mockito.verify(view, Mockito.times(1)).showLoading(true);
+        Mockito.verify(view, Mockito.times(1)).showError();
+        Mockito.verify(view, Mockito.times(1)).showLoading(false);
+        Mockito.verifyNoMoreInteractions(view);
     }
 }

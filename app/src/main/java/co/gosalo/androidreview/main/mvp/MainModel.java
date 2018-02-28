@@ -14,12 +14,30 @@ import io.reactivex.Observable;
 public class MainModel {
 
     private GosaloService service;
+    private int currentPage = 0;
+    private boolean last;
 
     public MainModel(GosaloService service) {
         this.service = service;
     }
 
-    public Observable<PagedResponseBody<List<Event>>> getEvents(int page) {
+    public boolean isLast() {
+        return last;
+    }
+
+    public Observable<List<Event>> getNextEvents() {
+        return getPagedEvents(currentPage).map(
+                listPagedResponseBody -> {
+                    last = listPagedResponseBody.isLast();
+                    if (!last) {
+                        currentPage++;
+                    }
+                    return listPagedResponseBody.getContent();
+                }
+        );
+    }
+
+    private Observable<PagedResponseBody<List<Event>>> getPagedEvents(int page) {
         return service.getEvents(page);
     }
 }

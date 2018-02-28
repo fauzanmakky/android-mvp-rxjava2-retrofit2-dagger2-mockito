@@ -22,9 +22,7 @@ public class MainPresenter {
     private final MainModel mainModel;
     private final MainView mainView;
     private CompositeDisposable disposables = new CompositeDisposable();
-    private Subject<Integer> page = PublishSubject.create();
-    private int currentPage = 0;
-    private boolean last;
+    private Subject<Boolean> page = PublishSubject.create();
 
     public MainPresenter(MainModel mainModel, MainView mainView) {
         this.mainView = mainView;
@@ -34,9 +32,9 @@ public class MainPresenter {
     public void onCreate() {
         mainView.showLoading(true);
         disposables.add(page.subscribe(
-                pageNumber -> disposables.add(loadEvents())
+                __ -> loadEvents()
         ));
-        page.onNext(currentPage);
+        page.onNext(true);
     }
 
     public void onDestroy() {
@@ -44,30 +42,33 @@ public class MainPresenter {
     }
 
     public void incrementPage() {
-        if (!last) {
-            currentPage++;
-            page.onNext(currentPage);
+        if (!mainModel.isLast()) {
+            page.onNext(true);
         }
     }
 
     private Disposable loadEvents() {
-        return mainModel.getEvents(currentPage)
+        return mainModel.getNextEvents()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                        listPagedResponseBody -> {
-                            mainView.addEvents(listPagedResponseBody.getContent());
-                            last = listPagedResponseBody.isLast();
+                        events -> {
+                            if (events.isEmpty()) {
+                                mainView.showNoEvents();
+                            } else {
+                                mainView.addEvents(events);
+                            }
+                            mainView.showLoading(false);
                         },
                         throwable -> {
                             if (throwable instanceof HttpException) {
                                 HttpException httpException = (HttpException) throwable;
                                 Log.d(LOG_TAG, String.valueOf(httpException.code()));
                             }
+                            mainView.showError();
                             mainView.showLoading(false);
                             Log.i(LOG_TAG, "Gosalo call failed: " + throwable.getMessage());
-                        },
-                        () -> mainView.showLoading(false)
+                        }
                 );
     }
 }

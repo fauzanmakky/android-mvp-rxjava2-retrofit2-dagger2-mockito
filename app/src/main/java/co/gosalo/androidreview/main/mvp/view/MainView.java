@@ -49,6 +49,13 @@ public class MainView extends FrameLayout {
         adapter.addEvents(events);
     }
 
+    public void showNoEvents() {
+    }
+
+    public void showError() {
+
+    }
+
     public void showLoading(boolean loading) {
         if (loading) {
             progressDialog.show();
